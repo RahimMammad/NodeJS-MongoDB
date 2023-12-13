@@ -7,7 +7,11 @@ import bodyParser from "body-parser"
 const app = express();
 dotenv.config()
 
-const {Schema} = mongoose
+const { Schema } = mongoose
+app.use(bodyParser.json())
+app.use(cors());
+
+
 
 const userSchema = new Schema({
     fullName: {type:String, required: true},
@@ -15,10 +19,17 @@ const userSchema = new Schema({
     email: {type:String, unique: true, required: true},
 }, {timestamps: true})
 
-app.use(bodyParser.json())
-app.use(cors());
-
 const Users = mongoose.model("users", userSchema)
+
+const categoriesSchema = new Schema({
+    name: {type:String, required: true},
+    description: {type: String, required: true},
+}, {timestamps: true})
+
+const Categories = mongoose.model("categories", categoriesSchema)
+
+
+
 
 app.get("/users", async (req, res) => {
     try {
@@ -45,8 +56,7 @@ app.put("/users/:id", async (req, res) => {
         if(users) {
             users.fullName = req.query.fullName,
             users.age = req.query.age,
-            users.email = req.query.email
-            
+            users.email = req.query.email           
             await users.save()
             res.send({msg: "User Updated"})
         } else {
@@ -61,6 +71,58 @@ app.delete("/users/:id", async (req, res) => {
     try {
         const users = await Users.findByIdAndDelete(req.params.id)
         res.status(200).send({msg: "User Deleted"})        
+    } catch (error) {
+        res.status(500).send({msg: error})
+    }
+})
+
+app.get("/categories", async (req, res) => {
+    try {
+        const categories = await Categories.find({})
+        res.send(categories)
+    } catch (error) {
+        res.status(500).send({message: error})
+    }
+})
+
+app.get("/categories/:id", async (req, res) => {
+    try {
+        const categories = await Categories.findById(req.params.id)
+        res.send(categories)
+    } catch (error) {
+        res.status(500).send({message: error})
+    }
+})
+
+app.post("/categories", (req, res) => {
+    const category = new Categories({
+        name: req.query.name,
+        description: req.query.description,
+    })
+    category.save()
+    res.send({msg: "Category created"})
+})
+
+app.put("/categories/:id", async (req, res) => {
+    try {
+        const categories = await Categories.findByIdAndUpdate(req.params.id)
+        if(categories) {
+            categories.name = req.query.name,
+            categories.description = req.query.description,          
+            await categories.save()
+            res.send({msg: "Category Updated"})
+        } else {
+            res.status(404).json({message:"Not Found"})
+        }
+    } catch (error) {
+        res.status(500).json({msg: error})
+    }
+})
+
+app.delete("/categories/:id", async (req, res) => {
+    try {
+        const categories = await Categories.findByIdAndDelete(req.params.id)
+        res.status(200).send({msg: "Category Deleted"})        
     } catch (error) {
         res.status(500).send({msg: error})
     }
