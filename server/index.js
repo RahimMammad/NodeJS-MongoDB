@@ -3,9 +3,9 @@ import cors from "cors"
 import mongoose from "mongoose";
 import dotenv from "dotenv"
 import bodyParser from "body-parser"
-import userRouter from "./routes/UserRouter.js";
-import categoryRouter from "./routes/CategoryRouter.js";
-import bookRouter from "./routes/BookRouter.js";
+import userRouter from "./src/routes/UserRouter.js";
+import categoryRouter from "./src/routes/CategoryRouter.js";
+import bookRouter from "./src/routes/BookRouter.js";
 
 
 const app = express();
